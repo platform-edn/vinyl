@@ -1,0 +1,49 @@
+syntax = "proto3";
+package proto;
+
+option go_package = "/internal/proto";
+
+message Record {
+    string domain = 1;
+    string address = 2;
+    uint32 ttl = 3;
+}
+
+message CreateRecordRequest {
+    string domain = 1;
+    string address = 2;
+    uint32 ttl = 3;
+}
+
+message CreateRecordResponse {
+    Record record = 1;
+}
+
+message RemoveRecordRequest {
+    string domain = 1;
+}
+
+message RemoveRecordResponse {
+    Record record = 1;
+}
+
+message GetRecordRequest {
+    string domain = 1;
+}
+
+message GetRecordResponse {
+    Record record = 1;
+}
+
+message ListRecordsRequest {}
+
+message ListRecordsResponse {
+    repeated Record records = 1;
+}
+
+service Records {
+    rpc CreateRecord (CreateRecordRequest) returns (CreateRecordResponse){}
+    rpc RemoveRecord (RemoveRecordRequest) returns (RemoveRecordResponse){}
+    rpc GetRecord (GetRecordRequest) returns (GetRecordResponse){}
+    rpc ListRecords (ListRecordsRequest) returns (ListRecordsResponse){}
+}
