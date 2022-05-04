@@ -18,7 +18,7 @@ type InvalidRecordAddressError struct {
 }
 
 func (e *InvalidRecordAddressError) Error() string {
-	return fmt.Sprintf("%s is set to the empty value but it is required", e.Address)
+	return fmt.Sprintf("%s is not a valid ip address", e.Address)
 }
 
 type InvalidRecordDomainError struct {
@@ -26,7 +26,15 @@ type InvalidRecordDomainError struct {
 }
 
 func (e *InvalidRecordDomainError) Error() string {
-	return fmt.Sprintf("%s is set to the empty value but it is required", e.Domain)
+	return fmt.Sprintf("%s is not a valid domain name", e.Domain)
+}
+
+type InvalidRecordTTLError struct {
+	TTL uint32
+}
+
+func (e *InvalidRecordTTLError) Error() string {
+	return fmt.Sprintf("%v is not a valid tll", e.TTL)
 }
 
 func NewRecord(domain string, address string, ttl uint32) (*Record, error) {
@@ -54,6 +62,12 @@ func ValidateRecord(record *Record) error {
 	if net.ParseIP(record.Address) == nil {
 		return fmt.Errorf("ValidateRecord: %w", &InvalidRecordAddressError{
 			Address: record.Address,
+		})
+	}
+
+	if record.TTL == 0 {
+		return fmt.Errorf("ValidateRecord: %w", &InvalidRecordTTLError{
+			TTL: record.TTL,
 		})
 	}
 

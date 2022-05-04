@@ -9,21 +9,7 @@ import (
 )
 
 func NewARecord(record *vinyl.Record) (*dns.A, error) {
-	var err error
-	switch {
-	case record.Domain == "":
-		err = &MissingFieldError{
-			Field: "Domain",
-		}
-	case record.TTL == 0:
-		err = &MissingFieldError{
-			Field: "TTL",
-		}
-	case record.Address == "":
-		err = &MissingFieldError{
-			Field: "IP",
-		}
-	}
+	err := vinyl.ValidateRecord(record)
 	if err != nil {
 		return nil, fmt.Errorf("NewARecord: %w", err)
 	}
