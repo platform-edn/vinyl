@@ -2,14 +2,6 @@ package dns
 
 import "fmt"
 
-type MissingFieldError struct {
-	Field string
-}
-
-func (e *MissingFieldError) Error() string {
-	return fmt.Sprintf("%s is set to the empty value but it is required", e.Field)
-}
-
 type UnsupportedOpCodeError struct {
 	Opcode int
 }

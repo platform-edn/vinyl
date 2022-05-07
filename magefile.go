@@ -28,6 +28,24 @@ func getMageDir() string {
 	return dir
 }
 
+// starts the vinyl server
+func Start() error {
+	cmd := filepath.Join(baseDir, "cmd", "server")
+
+	err := os.Chdir(cmd)
+	if err != nil {
+		return fmt.Errorf("Start: %s", err)
+	}
+	defer os.Chdir(baseDir)
+
+	err = sh.Run("go", "run", "main.go")
+	if err != nil {
+		return fmt.Errorf("Start: %s", err)
+	}
+
+	return nil
+}
+
 // updates grpc boilerplate
 func Proto() error {
 	protopath := filepath.Join(baseDir, "proto")
@@ -136,7 +154,7 @@ func mockWalkFunction(subDir string, info os.FileInfo, err error) error {
 func createMocks(subDir string) error {
 	os.Chdir(subDir)
 
-	err := sh.Run("mockery", "--all", "--case", "underscore")
+	err := sh.Run("mockery", "--all", "--with-expecter", "--case", "underscore")
 	if err != nil {
 		return fmt.Errorf("MakeMocks: %w", err)
 	}

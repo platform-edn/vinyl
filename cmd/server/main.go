@@ -23,15 +23,15 @@ type RecordStorer interface {
 func main() {
 	store := store.NewMemory()
 
-	go StartDNSServer(store, 53, "udp")
-	go StartAPIServer(store, 9005)
+	StartDNSServer(store, 53, "udp")
+	// go StartAPIServer(store, 9005)
 }
 
 func StartDNSServer(store RecordStorer, port int, protocol string) {
 	handler := dns.NewRecordHandler(store)
 	server := dns.NewServer(handler, port, protocol)
 
-	err := server.Start()
+	err := dns.Start(server)
 	if err != nil {
 		log.Fatalf(err.Error())
 	}
