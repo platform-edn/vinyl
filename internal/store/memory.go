@@ -20,13 +20,7 @@ func NewMemory(records ...vinyl.Record) *Memory {
 	}
 
 	return &Memory{
-		Records: RecordMap{
-			"jameshfisher.com.": vinyl.Record{
-				Domain:  "jameshfisher.com.",
-				Address: "142.250.191.174",
-				TTL:     43200,
-			},
-		},
+		Records: rmap,
 	}
 }
 
