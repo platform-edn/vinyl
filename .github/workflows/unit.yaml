@@ -7,18 +7,37 @@ jobs:
     name: Unit Test
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout Code
+    - name: checkout code
       uses: actions/checkout@v1
 
-    - name: Set Up Go
-      uses: actions/setup-go@v2
+    - name: asdf install
+      uses: asdf-vm/actions/install@v1
 
-    - name: Run Mage
-      uses: magefile/mage-action@v1
-      env:
-        ENV: CI
+    - name: cache go modules
+      uses: actions/cache@v3
       with:
-        args: -v race
+        path: |
+          ~/.cache/go-build
+          ~/go/pkg/mod
+        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-
+
+    - name: install protoc-gen-go
+      run: |
+        go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28 && \
+        go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2 && \
+        echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
+
+    - name: generate protobuf
+      run: mage -v proto
+
+    - name: generate mocks
+      run: mage -v mock
+
+    - name: run unit tests
+      run: mage -v race
+
     - name: Push Code Coverage
       uses: codecov/codecov-action@v1
       with:
