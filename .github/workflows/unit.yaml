@@ -1,0 +1,25 @@
+name: Unit Test
+on:
+  workflow_call: {}
+
+jobs:
+  test:
+    name: Unit Test
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v1
+
+    - name: Set Up Go
+      uses: actions/setup-go@v2
+
+    - name: Run Mage
+      uses: magefile/mage-action@v1
+      env:
+        ENV: CI
+      with:
+        args: -v race
+    - name: Push Code Coverage
+      uses: codecov/codecov-action@v1
+      with:
+        files: coverage.out
