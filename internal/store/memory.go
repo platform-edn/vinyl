@@ -2,6 +2,7 @@ package store
 
 import (
 	"fmt"
+	"sync"
 
 	vinyl "github.com/platform-edn/vinyl/internal"
 )
@@ -10,6 +11,7 @@ type RecordMap map[string]vinyl.Record
 
 type Memory struct {
 	Records RecordMap
+	mutex   sync.RWMutex
 }
 
 func NewMemory(records ...vinyl.Record) *Memory {
@@ -21,10 +23,14 @@ func NewMemory(records ...vinyl.Record) *Memory {
 
 	return &Memory{
 		Records: rmap,
+		mutex:   sync.RWMutex{},
 	}
 }
 
 func (store *Memory) GetRecord(domain string) (*vinyl.Record, error) {
+	store.mutex.RLock()
+	defer store.mutex.RUnlock()
+
 	record, exist := store.Records[domain]
 	if !exist {
 		return nil, fmt.Errorf("GetRecord: %w", &MissingRecordError{
@@ -36,6 +42,9 @@ func (store *Memory) GetRecord(domain string) (*vinyl.Record, error) {
 }
 
 func (store *Memory) RemoveRecord(domain string) (*vinyl.Record, error) {
+	store.mutex.Lock()
+	defer store.mutex.Unlock()
+
 	record, exist := store.Records[domain]
 	if !exist {
 		return nil, fmt.Errorf("RemoveRecord: %w", &MissingRecordError{
@@ -49,6 +58,9 @@ func (store *Memory) RemoveRecord(domain string) (*vinyl.Record, error) {
 }
 
 func (store *Memory) ListRecords() ([]vinyl.Record, error) {
+	store.mutex.RLock()
+	defer store.mutex.RUnlock()
+
 	records := []vinyl.Record{}
 	for _, record := range store.Records {
 		records = append(records, record)
@@ -58,6 +70,9 @@ func (store *Memory) ListRecords() ([]vinyl.Record, error) {
 }
 
 func (store *Memory) CreateRecord(domain string, address string, ttl uint32) (*vinyl.Record, error) {
+	store.mutex.Lock()
+	defer store.mutex.Unlock()
+
 	_, exist := store.Records[domain]
 	if exist {
 		return nil, fmt.Errorf("CreateRecord: %w", &ExistingRecordError{
