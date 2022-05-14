@@ -30,7 +30,7 @@ func getMageDir() string {
 
 // starts the vinyl server
 func Start() error {
-	cmd := filepath.Join(baseDir, "cmd", "server")
+	cmd := filepath.Join(baseDir, "cmd")
 
 	err := os.Chdir(cmd)
 	if err != nil {
